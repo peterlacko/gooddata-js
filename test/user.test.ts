@@ -47,12 +47,12 @@ describe('user', () => {
         describe('loginSso', () => {
             it('should resolve if user logged in', () => {
                 expect.assertions(1);
-                const encryptedClaims = `
+                const sessionId = `
                     -----BEGIN+PGP+MESSAGE-----
                     1234
                     -----END+PGP+MESSAGE-----
                 `;
-                const ssoProvider = 'foobar';
+                const serverUrl = 'foobar';
                 const targetUrl = '/dashboard.html';
 
                 fetchMock.mock(
@@ -60,25 +60,25 @@ describe('user', () => {
                     200
                 );
 
-                return createUser().loginSso(encryptedClaims, ssoProvider, targetUrl)
+                return createUser().loginSso(sessionId, serverUrl, targetUrl)
                     .then(r => expect(r.response.ok).toBeTruthy());
             });
 
             it('should reject for invalid sessionId', () => {
                 expect.assertions(1);
-                const encryptedClaims = `
+                const sessionId = `
                     -----BEGIN+PGP+MESSAGE-----
                     wrong sessionId
                     -----END+PGP+MESSAGE-----
                 `;
-                const ssoProvider = 'foobar';
+                const serverUrl = 'foobar';
                 const targetUrl = '/dashboard.html';
 
                 fetchMock.mock(
                     '/gdc/account/customerlogin',
                     400
                 );
-                return createUser().loginSso(encryptedClaims, ssoProvider, targetUrl).then(null, (err) => {
+                return createUser().loginSso(sessionId, serverUrl, targetUrl).then(null, (err) => {
                     expect(err.response.status).toBe(400);
                 });
             });

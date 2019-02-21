@@ -86,20 +86,17 @@ export class UserModule {
      * https://help.gooddata.com/display/developer/GoodData+PGP+Single+Sign-On
      *
      * @method loginSso
-     * @param {String} encryptedClaims PGP message
-     * @param {String} ssoProvider
+     * @param {String} sessionId urlEncoded PGP message
+     * @param {String} serverUrl
      * @param {String} targetUrl
      */
-    public loginSso(encryptedClaims: string, ssoProvider: string, targetUrl: string) {
+    public loginSso(sessionId: string, serverUrl: string, targetUrl: string) {
         return this.xhr.post(
             '/gdc/account/customerlogin',
             {
-                data: {
-                    pgpLoginRequest: {
-                        targetUrl,
-                        ssoProvider,
-                        encryptedClaims
-                    }
+                body: `encryptedClaims=${sessionId}&ssoProvider=${serverUrl}&targetUrl=${targetUrl}`,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
                 }
             }
         );

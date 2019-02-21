@@ -47,6 +47,46 @@ describe('user', () => {
         describe('loginSso', () => {
             it('should resolve if user logged in', () => {
                 expect.assertions(1);
+                const sessionId = `
+                    -----BEGIN+PGP+MESSAGE-----
+                    1234
+                    -----END+PGP+MESSAGE-----
+                `;
+                const serverUrl = 'foobar';
+                const targetUrl = '/dashboard.html';
+
+                fetchMock.mock(
+                    '/gdc/account/customerlogin',
+                    200
+                );
+
+                return createUser().loginSso(sessionId, serverUrl, targetUrl)
+                    .then(r => expect(r.response.ok).toBeTruthy());
+            });
+
+            it('should reject for invalid sessionId', () => {
+                expect.assertions(1);
+                const sessionId = `
+                    -----BEGIN+PGP+MESSAGE-----
+                    wrong sessionId
+                    -----END+PGP+MESSAGE-----
+                `;
+                const serverUrl = 'foobar';
+                const targetUrl = '/dashboard.html';
+
+                fetchMock.mock(
+                    '/gdc/account/customerlogin',
+                    400
+                );
+                return createUser().loginSso(sessionId, serverUrl, targetUrl).then(null, (err) => {
+                    expect(err.response.status).toBe(400);
+                });
+            });
+        });
+
+        describe('loginSsoJson', () => {
+            it('should resolve if user logged in', () => {
+                expect.assertions(1);
                 const encryptedClaims = `
                     -----BEGIN+PGP+MESSAGE-----
                     1234
@@ -60,7 +100,7 @@ describe('user', () => {
                     200
                 );
 
-                return createUser().loginSso(encryptedClaims, ssoProvider, targetUrl)
+                return createUser().loginSsoJson(encryptedClaims, ssoProvider, targetUrl)
                     .then(r => expect(r.response.ok).toBeTruthy());
             });
 
@@ -78,7 +118,7 @@ describe('user', () => {
                     '/gdc/account/customerlogin',
                     400
                 );
-                return createUser().loginSso(encryptedClaims, ssoProvider, targetUrl).then(null, (err) => {
+                return createUser().loginSsoJson(encryptedClaims, ssoProvider, targetUrl).then(null, (err) => {
                     expect(err.response.status).toBe(400);
                 });
             });
